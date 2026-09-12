@@ -9,8 +9,8 @@
 //  así que basta cambiar API_BASE y todo el resto sigue funcionando.
 // =====================================================================
 window.APP_CONFIG = {
-  // Cambia esto por la URL del API Gateway cuando P3 lo tenga listo.
-  API_BASE: "http://localhost",
+  // URL del API Gateway (HTTPS + CORS) → VPC Link → ALB interno → prod MVs.
+  API_BASE: "https://h4sh35u9ac.execute-api.us-east-1.amazonaws.com",
 
   // Puertos locales (solo se usan cuando API_BASE es localhost).
   PUERTOS_LOCAL: { ms1: 8001, ms2: 8002, ms3: 8003, ms4: 8004, ms5: 8005 },
