@@ -1,0 +1,101 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Transporte Urbano · Panel</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600;700&display=swap" />
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <header class="top">
+    <div class="brand">
+      <span class="logo">◆</span>
+      <div>
+        <h1>Transporte Urbano</h1>
+        <p class="sub">Panel de operaciones · CS2032</p>
+      </div>
+    </div>
+    <div class="apibox">
+      <label>API</label>
+      <code id="api-actual">—</code>
+    </div>
+  </header>
+
+  <nav class="tabs" id="tabs">
+    <button class="tab activa" data-tab="usuarios">Usuarios</button>
+    <button class="tab" data-tab="viajes">Viajes</button>
+    <button class="tab" data-tab="calificaciones">Calificaciones</button>
+    <button class="tab" data-tab="conductor">Resumen conductor</button>
+    <button class="tab" data-tab="analitica">Analítica</button>
+  </nav>
+
+  <main>
+    <!-- USUARIOS (MS1: GET /ms1/usuarios + GET /ms1/usuarios/{id}) -->
+    <section id="tab-usuarios" class="panel activa">
+      <div class="panel-head">
+        <h2>Usuarios <span class="ms">MS1</span></h2>
+        <span class="metodos">GET /ms1/usuarios · GET /ms1/usuarios/{id}</span>
+      </div>
+      <div class="tablewrap"><table id="tabla-usuarios"><thead><tr>
+        <th>ID</th><th>Nombre</th><th>Distrito</th><th>Registro</th><th></th>
+      </tr></thead><tbody></tbody></table></div>
+      <div class="paginacion" id="pag-usuarios"></div>
+    </section>
+
+    <!-- VIAJES (MS2: GET /ms2/viajes + GET /ms2/viajes/{id}) -->
+    <section id="tab-viajes" class="panel">
+      <div class="panel-head">
+        <h2>Viajes <span class="ms">MS2</span></h2>
+        <span class="metodos">GET /ms2/viajes · GET /ms2/viajes/{id}</span>
+      </div>
+      <div class="tablewrap"><table id="tabla-viajes"><thead><tr>
+        <th>ID</th><th>Origen → Destino</th><th>Estado</th><th>Monto</th><th>Método</th>
+      </tr></thead><tbody></tbody></table></div>
+      <div class="paginacion" id="pag-viajes"></div>
+    </section>
+
+    <!-- CALIFICACIONES (MS3: GET /ms3/calificaciones + GET /ms3/calificaciones/{id}) -->
+    <section id="tab-calificaciones" class="panel">
+      <div class="panel-head">
+        <h2>Calificaciones <span class="ms">MS3</span></h2>
+        <span class="metodos">GET /ms3/calificaciones · GET /ms3/calificaciones/{id}</span>
+      </div>
+      <div class="tablewrap"><table id="tabla-calificaciones"><thead><tr>
+        <th>Viaje</th><th>Rating</th><th>Comentario</th><th>Tags</th><th>Fecha</th>
+      </tr></thead><tbody></tbody></table></div>
+      <div class="paginacion" id="pag-calificaciones"></div>
+    </section>
+
+    <!-- RESUMEN CONDUCTOR (MS3: GET /ms3/conductores/{id}/resumen) -->
+    <section id="tab-conductor" class="panel">
+      <div class="panel-head">
+        <h2>Resumen de conductor <span class="ms">MS3</span></h2>
+        <span class="metodos">GET /ms3/conductores/{id}/resumen</span>
+      </div>
+      <div class="buscador">
+        <input id="conductor-id" type="number" min="1" max="600" value="101" placeholder="ID conductor (1–600)" />
+        <button id="btn-conductor">Consultar</button>
+      </div>
+      <div id="resumen-conductor" class="tarjetas"></div>
+    </section>
+
+    <!-- ANALITICA (MS5: GET /ms5/ingresos/por-hora-distrito) -->
+    <section id="tab-analitica" class="panel">
+      <div class="panel-head">
+        <h2>Ingreso promedio por hora y distrito <span class="ms">MS5</span></h2>
+        <span class="metodos">GET /ms5/ingresos/por-hora-distrito</span>
+      </div>
+      <div id="analitica-cont" class="tablewrap"></div>
+    </section>
+
+    <div id="aviso" class="aviso" hidden></div>
+  </main>
+
+  <footer>transporte urbano · CS2032 · frontend (P4) · desplegable en AWS Amplify</footer>
+
+  <script src="config.js"></script>
+  <script src="app.js"></script>
+</body>
+</html>

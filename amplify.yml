@@ -1,0 +1,14 @@
+# Build spec para AWS Amplify.
+# Es un sitio estático (HTML/CSS/JS sin build), así que solo publica la raíz.
+version: 1
+frontend:
+  phases:
+    build:
+      commands:
+        - echo "Sitio estatico, sin paso de build"
+  artifacts:
+    baseDirectory: /
+    files:
+      - '**/*'
+  cache:
+    paths: []
