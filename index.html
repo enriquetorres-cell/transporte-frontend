@@ -8,7 +8,39 @@
   <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600;700&display=swap" />
   <link rel="stylesheet" href="styles.css" />
 </head>
-<body>
+<body class="bloqueado">
+  <!-- ===== LOGIN ===== -->
+  <div id="login-gate">
+    <div class="login-card">
+      <span class="login-logo">◆</span>
+      <h1>Transporte Urbano</h1>
+      <p class="login-sub">Panel de operaciones · CS2032</p>
+      <div class="auth-toggle" id="auth-toggle">
+        <button class="auth-tab activa" data-modo="login">Iniciar sesión</button>
+        <button class="auth-tab" data-modo="registro">Crear cuenta</button>
+      </div>
+
+      <input class="login-input" id="in-nombre" type="text" placeholder="Nombre" autocomplete="name" hidden />
+      <input class="login-input" id="in-email" type="email" placeholder="Correo" autocomplete="username" />
+      <input class="login-input" id="in-pass" type="password" placeholder="Contraseña" autocomplete="current-password" />
+      <button class="btn-login primario" id="btn-auth">Iniciar sesión</button>
+      <p class="login-error" id="login-error" hidden></p>
+
+      <div class="login-div"><span>accesos rápidos</span></div>
+
+      <button class="btn-login demo" id="btn-demo">Entrar como Demo</button>
+      <button class="btn-login admin" id="btn-admin">Entrar como Administrador</button>
+
+      <div class="login-div"><span>o</span></div>
+
+      <p class="login-google-label">Crear cuenta / iniciar con Gmail</p>
+      <div id="google-btn"></div>
+      <p class="login-nota" id="google-nota" hidden>⚠ Configura tu Client ID de Google en <code>config.js</code> para activar el botón de Gmail.</p>
+
+      <p class="login-pie">CS2032 · frontend (P4) · AWS Amplify</p>
+    </div>
+  </div>
+
   <header class="top">
     <div class="brand">
       <span class="logo">◆</span>
@@ -17,9 +49,18 @@
         <p class="sub">Panel de operaciones · CS2032</p>
       </div>
     </div>
-    <div class="apibox">
-      <label>API</label>
-      <code id="api-actual">—</code>
+    <div class="cabecera-der">
+      <div class="apibox">
+        <label>API</label>
+        <code id="api-actual">—</code>
+      </div>
+      <div class="userbox" id="userbox">
+        <div class="userinfo">
+          <span class="uname" id="uname">—</span>
+          <span class="urole" id="urole">—</span>
+        </div>
+        <button class="btn-logout" id="btn-logout">Salir</button>
+      </div>
     </div>
   </header>
 
@@ -28,7 +69,8 @@
     <button class="tab" data-tab="viajes">Viajes</button>
     <button class="tab" data-tab="calificaciones">Calificaciones</button>
     <button class="tab" data-tab="conductor">Resumen conductor</button>
-    <button class="tab" data-tab="analitica">Analítica</button>
+    <button class="tab" data-tab="perfil">Perfil MS4</button>
+    <button class="tab" data-tab="analitica" data-admin="1">Analítica</button>
   </nav>
 
   <main>
@@ -81,6 +123,21 @@
       <div id="resumen-conductor" class="tarjetas"></div>
     </section>
 
+    <!-- PERFIL (MS4: orquestador, consume MS1+MS2+MS3) -->
+    <section id="tab-perfil" class="panel">
+      <div class="panel-head">
+        <h2>Historial · orquestador <span class="ms">MS4</span></h2>
+        <span class="metodos">GET /ms4/usuarios/{id}/perfil · GET /ms4/conductores/{id}/hoja-de-vida</span>
+      </div>
+      <div class="buscador">
+        <input id="perfil-usuario-id" type="number" min="1" max="20000" value="5" placeholder="ID usuario" />
+        <button id="btn-perfil-usuario">Perfil de usuario</button>
+        <input id="perfil-conductor-id" type="number" min="1" max="600" value="101" placeholder="ID conductor" />
+        <button id="btn-perfil-conductor">Hoja de vida</button>
+      </div>
+      <div id="perfil-resultado"></div>
+    </section>
+
     <!-- ANALITICA (MS5: GET /ms5/ingresos/por-hora-distrito) -->
     <section id="tab-analitica" class="panel">
       <div class="panel-head">
@@ -95,6 +152,7 @@
 
   <footer>transporte urbano · CS2032 · frontend (P4) · desplegable en AWS Amplify</footer>
 
+  <script src="https://accounts.google.com/gsi/client" async defer></script>
   <script src="config.js"></script>
   <script src="app.js"></script>
 </body>

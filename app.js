@@ -7,6 +7,99 @@
 
 document.getElementById("api-actual").textContent = window.APP_CONFIG.API_BASE;
 
+// ===== AUTENTICACIÓN (demo / administrador / Gmail) =====
+const SESION_KEY = "transporte_sesion";
+let sesion = null;
+
+function entrar(nombre, rol) {
+  sesion = { nombre, rol };
+  try { localStorage.setItem(SESION_KEY, JSON.stringify(sesion)); } catch (e) {}
+  aplicarSesion();
+}
+function salir() {
+  sesion = null;
+  try { localStorage.removeItem(SESION_KEY); } catch (e) {}
+  document.body.classList.add("bloqueado");
+}
+function aplicarSesion() {
+  document.body.classList.remove("bloqueado");
+  document.getElementById("uname").textContent = sesion.nombre;
+  document.getElementById("urole").textContent = sesion.rol;
+  // Restricción por rol: la pestaña Analítica es solo para Administrador
+  const esAdmin = sesion.rol === "Administrador";
+  document.querySelectorAll('.tab[data-admin="1"]').forEach((t) => { t.hidden = !esAdmin; });
+  cargarUsuarios();
+}
+function restaurar() {
+  try {
+    const s = JSON.parse(localStorage.getItem(SESION_KEY) || "null");
+    if (s && s.nombre) { sesion = s; aplicarSesion(); }
+  } catch (e) {}
+}
+function iniciarGoogle() {
+  const cid = window.APP_CONFIG.GOOGLE_CLIENT_ID;
+  if (!cid) { document.getElementById("google-nota").hidden = false; return; }
+  const arranque = () => {
+    if (!(window.google && google.accounts && google.accounts.id)) { setTimeout(arranque, 300); return; }
+    google.accounts.id.initialize({ client_id: cid, callback: onGoogle });
+    google.accounts.id.renderButton(document.getElementById("google-btn"),
+      { theme: "filled_blue", size: "large", text: "continue_with", width: 300 });
+  };
+  arranque();
+}
+function onGoogle(resp) {
+  // Decodifica el payload del JWT de Google para el nombre/email (demo, sin verificar firma).
+  try {
+    const p = JSON.parse(atob(resp.credential.split(".")[1].replace(/-/g, "+").replace(/_/g, "/")));
+    entrar(p.name || p.email || "Usuario Gmail", "Gmail");
+  } catch (e) { entrar("Usuario Gmail", "Gmail"); }
+}
+document.getElementById("btn-demo").addEventListener("click", () => entrar("Invitado", "Demo"));
+document.getElementById("btn-admin").addEventListener("click", () => entrar("Administrador", "Administrador"));
+document.getElementById("btn-logout").addEventListener("click", salir);
+
+// --- Cuentas con correo/contraseña (crear cuenta + iniciar sesión) ---
+// Demo: se guardan en localStorage del navegador (no hay backend de auth).
+const USERS_KEY = "transporte_usuarios";
+function getUsuarios() { try { return JSON.parse(localStorage.getItem(USERS_KEY) || "[]"); } catch (e) { return []; } }
+function setUsuarios(u) { try { localStorage.setItem(USERS_KEY, JSON.stringify(u)); } catch (e) {} }
+function errorLogin(msg) { const e = document.getElementById("login-error"); e.textContent = msg; e.hidden = false; }
+
+// Toggle entre "Iniciar sesión" y "Crear cuenta"
+let modoAuth = "login";
+const authToggle = document.getElementById("auth-toggle");
+const inNombre = document.getElementById("in-nombre");
+const btnAuth = document.getElementById("btn-auth");
+
+authToggle.addEventListener("click", (e) => {
+  const t = e.target.closest(".auth-tab"); if (!t) return;
+  modoAuth = t.dataset.modo;
+  authToggle.querySelectorAll(".auth-tab").forEach((x) => x.classList.toggle("activa", x === t));
+  inNombre.hidden = modoAuth !== "registro";
+  btnAuth.textContent = modoAuth === "registro" ? "Crear cuenta" : "Iniciar sesión";
+  document.getElementById("login-error").hidden = true;
+});
+
+btnAuth.addEventListener("click", () => {
+  const email = document.getElementById("in-email").value.trim().toLowerCase();
+  const pass = document.getElementById("in-pass").value;
+  if (!email || !pass) return errorLogin("Completa correo y contraseña.");
+
+  if (modoAuth === "registro") {
+    if (pass.length < 4) return errorLogin("La contraseña debe tener al menos 4 caracteres.");
+    const us = getUsuarios();
+    if (us.find((x) => x.email === email)) return errorLogin("Ese correo ya tiene cuenta. Inicia sesión.");
+    const nombre = inNombre.value.trim() || email.split("@")[0];
+    us.push({ email, pass, nombre });
+    setUsuarios(us);
+    entrar(nombre, "Usuario");        // crea la cuenta e inicia sesión
+  } else {
+    const u = getUsuarios().find((x) => x.email === email && x.pass === pass);
+    if (!u) return errorLogin("Correo o contraseña incorrectos (o la cuenta no existe).");
+    entrar(u.nombre, "Usuario");
+  }
+});
+
 // --- helper de fetch tolerante a fallos ------------------------------
 async function pedir(url) {
   try {
@@ -145,6 +238,47 @@ async function cargarResumenConductor() {
     `<div class="card"><div class="k">${k}</div><div class="v">${v}</div></div>`).join("");
 }
 
+// MS4 · orquestador (perfil = MS1 + MS2 + MS3, sin BD propia)
+function avisosHTML(av) {
+  return (av && av.length) ? `<div class="aviso" style="display:block;margin-top:14px">⚠ ${av.join(" · ")}</div>` : "";
+}
+document.getElementById("btn-perfil-usuario").addEventListener("click", cargarPerfilUsuario);
+document.getElementById("btn-perfil-conductor").addEventListener("click", cargarHojaVida);
+
+async function cargarPerfilUsuario() {
+  const id = document.getElementById("perfil-usuario-id").value || 5;
+  const cont = document.getElementById("perfil-resultado");
+  cont.innerHTML = `<div class="cargando">Cargando… (MS4 consulta MS1 + MS2 + MS3)</div>`;
+  const d = await pedir(`${urlDe("ms4")}/usuarios/${id}/perfil`);
+  if (!d) { cont.innerHTML = ""; return; }
+  const u = d.usuario || {};
+  cont.innerHTML = `
+    <div class="tarjetas">
+      <div class="card"><div class="k">Usuario · MS1</div><div class="v" style="font-size:17px">${(u.nombre ?? "—") + " " + (u.apellido ?? "")}</div><div class="k">${u.distrito ?? ""}</div></div>
+      <div class="card"><div class="k">Últimos viajes · MS2</div><div class="v">${(d.ultimos_viajes || []).length}</div></div>
+      <div class="card"><div class="k">Calificaciones · MS3</div><div class="v">${(d.calificaciones || []).length}</div></div>
+    </div>${avisosHTML(d.advertencias)}
+    <p style="color:var(--muted);font-size:13px;margin-top:14px">MS4 unió los 3 microservicios en una sola respuesta (no tiene base de datos propia).</p>`;
+}
+
+async function cargarHojaVida() {
+  const id = document.getElementById("perfil-conductor-id").value || 101;
+  const cont = document.getElementById("perfil-resultado");
+  cont.innerHTML = `<div class="cargando">Cargando… (MS4 consulta MS1 + MS2 + MS3)</div>`;
+  const d = await pedir(`${urlDe("ms4")}/conductores/${id}/hoja-de-vida`);
+  if (!d) { cont.innerHTML = ""; return; }
+  const c = d.conductor || {};
+  const r = d.resumen_calificaciones || {};
+  cont.innerHTML = `
+    <div class="tarjetas">
+      <div class="card"><div class="k">Conductor · MS1</div><div class="v" style="font-size:17px">${(c.nombre ?? "—") + " " + (c.apellido ?? "")}</div><div class="k">${c.distrito_base ?? ""}</div></div>
+      <div class="card"><div class="k">Vehículos · MS1</div><div class="v">${(d.vehiculos || []).length}</div></div>
+      <div class="card"><div class="k">Viajes · MS2</div><div class="v">${(d.ultimos_viajes || []).length}</div></div>
+      <div class="card"><div class="k">Rating · MS3</div><div class="v">${r.rating_promedio ?? r.promedio ?? "—"}</div></div>
+    </div>${avisosHTML(d.advertencias)}
+    <p style="color:var(--muted);font-size:13px;margin-top:14px">MS4 orquestó MS1 + MS2 + MS3 para armar la hoja de vida.</p>`;
+}
+
 // MS5 · GET /ms5/ingresos/por-hora-distrito  (consulta estrella)
 async function cargarAnalitica() {
   const cont = document.getElementById("analitica-cont");
@@ -165,5 +299,6 @@ async function cargarAnalitica() {
   }).join("") + `</div>`;
 }
 
-// arranque
-cargarUsuarios();
+// arranque: autenticación (muestra el login o restaura la sesión guardada)
+iniciarGoogle();
+restaurar();
