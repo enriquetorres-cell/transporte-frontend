@@ -279,24 +279,61 @@ async function cargarHojaVida() {
     <p style="color:var(--muted);font-size:13px;margin-top:14px">MS4 orquestó MS1 + MS2 + MS3 para armar la hoja de vida.</p>`;
 }
 
-// MS5 · GET /ms5/ingresos/por-hora-distrito  (consulta estrella)
+// MS5 · 2 métodos: consulta estrella (ingresos) + rating por distrito (Athena)
 async function cargarAnalitica() {
   const cont = document.getElementById("analitica-cont");
-  cont.innerHTML = `<div class="cargando">Cargando analítica…</div>`;
-  const d = await pedir(`${urlDe("ms5")}/ingresos/por-hora-distrito`);
-  if (!d || !d.items || !d.items.length) {
-    cont.innerHTML = `<div class="cargando">Sin datos de MS5 todavía (falta desplegar el analítico / Athena).</div>`;
-    return;
+  cont.innerHTML = `<div class="cargando">Cargando analítica… (Athena puede tardar unos segundos)</div>`;
+  const [ingresos, rating] = await Promise.all([
+    pedir(`${urlDe("ms5")}/ingresos/por-hora-distrito`),
+    pedir(`${urlDe("ms5")}/conductores/rating-por-distrito`),
+  ]);
+  let html = "";
+
+  if (ingresos && ingresos.items && ingresos.items.length) {
+    html += `<h3 style="margin:8px 0 12px;font-size:14px;font-weight:600">Ingreso promedio por hora del día
+      <span class="metodos">GET /ms5/ingresos/por-hora-distrito</span></h3>
+      <div style="height:300px;background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:14px">
+        <canvas id="chart-ingresos"></canvas>
+      </div>`;
   }
-  const max = Math.max(...d.items.map((x) => x.ingreso_promedio || 0));
-  cont.innerHTML = `<div style="padding:16px">` + d.items.slice(0, 20).map((x) => {
-    const pct = max ? Math.round(((x.ingreso_promedio || 0) / max) * 100) : 0;
-    return `<div class="barra">
-      <span class="etq">${x.distrito} · ${String(x.hora).padStart(2, "0")}h</span>
-      <span class="track"><span class="fill" style="width:${pct}%"></span></span>
-      <span class="num">S/ ${Number(x.ingreso_promedio || 0).toFixed(2)}</span>
-    </div>`;
-  }).join("") + `</div>`;
+
+  if (rating && rating.items && rating.items.length) {
+    html += `<h3 style="margin:24px 0 10px;font-size:14px;font-weight:600">Rating por distrito del conductor
+      <span class="metodos">GET /ms5/conductores/rating-por-distrito</span></h3>
+      <div class="tablewrap"><table><thead><tr>
+        <th>Distrito</th><th>Conductores</th><th>Calificaciones</th><th>Rating prom.</th>
+      </tr></thead><tbody>` + rating.items.map((x) =>
+        `<tr><td>${x.distrito_base ?? "—"}</td><td>${x.conductores ?? "—"}</td><td>${x.calificaciones ?? "—"}</td><td class="rating">${x.rating_promedio ?? "—"}</td></tr>`
+      ).join("") + `</tbody></table></div>`;
+  }
+
+  cont.innerHTML = html || `<div class="cargando">Sin datos de MS5 (¿está desplegado el analítico?).</div>`;
+
+  // Gráfico real (Chart.js): ingreso promedio por hora, agregado de todos los distritos
+  if (ingresos && ingresos.items && ingresos.items.length && window.Chart) {
+    const porHora = {};
+    ingresos.items.forEach((x) => {
+      const h = Number(x.hora);
+      (porHora[h] = porHora[h] || []).push(x.ingreso_promedio || 0);
+    });
+    const horas = Object.keys(porHora).map(Number).sort((a, b) => a - b);
+    const valores = horas.map((h) => +(porHora[h].reduce((s, v) => s + v, 0) / porHora[h].length).toFixed(2));
+    new Chart(document.getElementById("chart-ingresos"), {
+      type: "bar",
+      data: {
+        labels: horas.map((h) => String(h).padStart(2, "0") + "h"),
+        datasets: [{ label: "Ingreso promedio (S/)", data: valores, backgroundColor: "#34cedd", borderRadius: 4 }],
+      },
+      options: {
+        responsive: true, maintainAspectRatio: false,
+        plugins: { legend: { labels: { color: "#93a3b5" } } },
+        scales: {
+          x: { ticks: { color: "#93a3b5" }, grid: { color: "#243242" } },
+          y: { ticks: { color: "#93a3b5" }, grid: { color: "#243242" }, beginAtZero: true },
+        },
+      },
+    });
+  }
 }
 
 // arranque: autenticación (muestra el login o restaura la sesión guardada)
