@@ -371,9 +371,11 @@ async function cargarHojaVida() {
 async function cargarAnalitica() {
   const cont = document.getElementById("analitica-cont");
   cont.innerHTML = `<div class="cargando">Cargando analítica… (Athena puede tardar unos segundos)</div>`;
-  const [ingresos, rating] = await Promise.all([
+  const [ingresos, rating, vRating, vIngreso] = await Promise.all([
     pedir(`${urlDe("ms5")}/ingresos/por-hora-distrito`),
     pedir(`${urlDe("ms5")}/conductores/rating-por-distrito`),
+    pedir(`${urlDe("ms5")}/vistas/rating-conductor?limit=10`),
+    pedir(`${urlDe("ms5")}/vistas/ingreso-hora-distrito?limit=10`),
   ]);
   let html = "";
 
@@ -393,6 +395,23 @@ async function cargarAnalitica() {
       </tr></thead><tbody>` + rating.items.map((x) =>
         `<tr><td>${x.distrito_base ?? "—"}</td><td>${x.conductores ?? "—"}</td><td>${x.calificaciones ?? "—"}</td><td class="rating">${x.rating_promedio ?? "—"}</td></tr>`
       ).join("") + `</tbody></table></div>`;
+  }
+
+  // Vistas de Athena (v_rating_conductor, v_ingreso_hora_distrito)
+  const tablaVista = (titulo, ruta, cols, filas) => `<h3 style="margin:24px 0 10px;font-size:14px;font-weight:600">${titulo}
+      <span class="metodos">GET ${ruta}</span></h3>
+      <div class="tablewrap"><table><thead><tr>${cols.map(([t]) => `<th>${t}</th>`).join("")}</tr></thead><tbody>` +
+      filas.map((x) => `<tr>${cols.map(([, k]) => `<td>${x[k] ?? "—"}</td>`).join("")}</tr>`).join("") +
+      `</tbody></table></div>`;
+  if (vRating && vRating.items && vRating.items.length) {
+    html += tablaVista("Top 10 conductores por rating · vista v_rating_conductor", "/ms5/vistas/rating-conductor",
+      [["Conductor", "conductor_id"], ["Nombre", "nombre"], ["Apellido", "apellido"], ["Calificaciones", "calificaciones"], ["Rating prom.", "rating_promedio"]],
+      vRating.items);
+  }
+  if (vIngreso && vIngreso.items && vIngreso.items.length) {
+    html += tablaVista("Franjas con mayor ingreso promedio · vista v_ingreso_hora_distrito", "/ms5/vistas/ingreso-hora-distrito",
+      [["Distrito", "distrito"], ["Hora", "hora"], ["Viajes", "viajes"], ["Ingreso prom. (S/)", "ingreso_promedio"]],
+      vIngreso.items);
   }
 
   cont.innerHTML = html || `<div class="cargando">Sin datos de MS5 (¿está desplegado el analítico?).</div>`;
