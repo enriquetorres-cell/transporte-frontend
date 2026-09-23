@@ -3,18 +3,18 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Transporte Urbano · Panel</title>
+  <title>VÍA · Operaciones</title>
   <link rel="preconnect" href="https://fonts.googleapis.com" />
-  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600;700&display=swap" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@500&family=IBM+Plex+Sans:wght@400;500;600&family=Space+Grotesk:wght@600;700&display=swap" />
   <link rel="stylesheet" href="styles.css" />
 </head>
-<body class="bloqueado">
+<body class="bloqueado" data-vista="usuarios">
   <!-- ===== LOGIN ===== -->
   <div id="login-gate">
     <div class="login-card">
-      <span class="login-logo">◆</span>
-      <h1>Transporte Urbano</h1>
-      <p class="login-sub">Panel de operaciones · CS2032</p>
+      <div class="login-marca"><span class="marca-logo">VÍA</span><span class="marca-punto"></span></div>
+      <p class="login-sub">Backoffice de operaciones · transporte urbano</p>
       <div class="auth-toggle" id="auth-toggle">
         <button class="auth-tab activa" data-modo="login">Iniciar sesión</button>
         <button class="auth-tab" data-modo="registro">Crear cuenta</button>
@@ -35,170 +35,210 @@
 
       <p class="login-google-label">Crear cuenta / iniciar con Gmail</p>
       <div id="google-btn"></div>
-      <p class="login-nota" id="google-nota" hidden>⚠ Configura tu Client ID de Google en <code>config.js</code> para activar el botón de Gmail.</p>
+      <p class="login-nota" id="google-nota" hidden>Configura tu Client ID de Google en <code>config.js</code> para activar el botón de Gmail.</p>
 
       <p class="login-pie">CS2032 · frontend (P4) · AWS Amplify</p>
     </div>
   </div>
 
-  <header class="top">
-    <div class="brand">
-      <span class="logo">◆</span>
-      <div>
-        <h1>Transporte Urbano</h1>
-        <p class="sub">Panel de operaciones · CS2032</p>
-      </div>
-    </div>
-    <div class="cabecera-der">
-      <div class="apibox">
-        <label>API</label>
-        <code id="api-actual">—</code>
-      </div>
-      <div class="userbox" id="userbox">
-        <div class="userinfo">
-          <span class="uname" id="uname">—</span>
-          <span class="urole" id="urole">—</span>
+  <div class="shell">
+    <!-- ===== SIDEBAR (Asfalto) ===== -->
+    <aside class="sidebar">
+      <div class="marca"><span class="marca-logo">VÍA</span><span class="marca-punto"></span><span class="marca-sub">Operaciones · Lima</span></div>
+
+      <section class="red-vivo" aria-label="Estado de la red">
+        <h2 class="red-titulo"><span class="pulso"></span>Red en vivo</h2>
+        <ul id="red-vivo">
+          <li data-ms="ms1"><span class="punto"></span>Usuarios <span class="lat">—</span></li>
+          <li data-ms="ms2"><span class="punto"></span>Viajes <span class="lat">—</span></li>
+          <li data-ms="ms3"><span class="punto"></span>Calificaciones <span class="lat">—</span></li>
+          <li data-ms="ms4"><span class="punto"></span>Historial <span class="lat">—</span></li>
+          <li data-ms="ms5"><span class="punto"></span>Analítica <span class="lat">—</span></li>
+        </ul>
+      </section>
+
+      <nav class="nav" id="tabs" aria-label="Secciones">
+        <button class="tab activa" data-tab="usuarios" data-titulo="Usuarios">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="8" r="3.5"/><path d="M5 20c1.2-3.6 4-5.5 7-5.5s5.8 1.9 7 5.5"/></svg>
+          Usuarios <span class="ms">MS1</span></button>
+        <button class="tab" data-tab="reglas" data-titulo="Conductores y reglas de operación">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="8"/><circle cx="12" cy="12" r="2"/><path d="M12 4v6M5.2 16l5.1-2.9M18.8 16l-5.1-2.9"/></svg>
+          Conductores <span class="ms">MS1</span></button>
+        <button class="tab" data-tab="viajes" data-titulo="Viajes">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="6" cy="18" r="2.5"/><circle cx="18" cy="6" r="2.5"/><path d="M8.5 18H15a3 3 0 0 0 0-6H9a3 3 0 0 1 0-6h6.5"/></svg>
+          Viajes <span class="ms">MS2</span></button>
+        <button class="tab" data-tab="calificaciones" data-titulo="Calificaciones">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 4l2.4 5 5.4.6-4 3.7 1.1 5.3L12 16l-4.9 2.6 1.1-5.3-4-3.7 5.4-.6z"/></svg>
+          Calificaciones <span class="ms">MS3</span></button>
+        <button class="tab" data-tab="conductor" data-titulo="Reputación del conductor">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 19h16M7 16V11M12 16V6M17 16v-3"/></svg>
+          Reputación <span class="ms">MS3</span></button>
+        <button class="tab" data-tab="perfil" data-titulo="Perfil e historial">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><rect x="4" y="4" width="16" height="16" rx="2"/><path d="M8 9h8M8 13h8M8 17h5"/></svg>
+          Perfil <span class="ms">MS4</span></button>
+        <button class="tab" data-tab="analitica" data-admin="1" data-titulo="Analítica de la red">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 18l5-6 4 3 7-9"/><path d="M15 6h5v5"/></svg>
+          Analítica <span class="ms">MS5</span></button>
+      </nav>
+
+      <div class="turno" id="userbox">
+        <div class="turno-fila">
+          <div class="userinfo">
+            <span class="urole" id="urole">—</span>
+            <span class="uname" id="uname">—</span>
+          </div>
+          <button class="btn-logout" id="btn-logout">Salir</button>
         </div>
-        <button class="btn-logout" id="btn-logout">Salir</button>
+        <div class="turno-meta"><span id="reloj">--:--</span> · <code id="api-actual">—</code></div>
+      </div>
+    </aside>
+
+    <!-- ===== COLUMNA PRINCIPAL ===== -->
+    <div class="columna">
+      <header class="topbar">
+        <h1 id="titulo">Usuarios</h1>
+        <form class="busqueda" id="busqueda-global" role="search">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="11" cy="11" r="6"/><path d="M20 20l-4.5-4.5"/></svg>
+          <input id="busqueda-input" type="search" placeholder="ID de usuario · C101 conductor · V2044 viaje" aria-label="Buscar por ID" />
+        </form>
+      </header>
+
+      <div class="area">
+        <main>
+          <!-- USUARIOS (MS1: GET /ms1/usuarios + GET /ms1/usuarios/{id}) -->
+          <section id="tab-usuarios" class="panel activa">
+            <div class="panel-head">
+              <p class="bajada">Pasajeros registrados. Elige una fila para ver su ficha.</p>
+              <span class="metodos">GET /ms1/usuarios · GET /ms1/usuarios/{id}</span>
+            </div>
+            <div class="tablewrap"><table id="tabla-usuarios"><thead><tr>
+              <th>ID</th><th>Nombre</th><th>Distrito</th><th>Registro</th>
+            </tr></thead><tbody></tbody></table></div>
+            <div class="paginacion" id="pag-usuarios"></div>
+          </section>
+
+          <!-- VIAJES (MS2: GET /ms2/viajes + GET /ms2/viajes/{id}) -->
+          <section id="tab-viajes" class="panel">
+            <div class="panel-head">
+              <p class="bajada">Movimiento de la red. El borde de cada fila marca su estado.</p>
+              <span class="metodos">GET /ms2/viajes?estado=&amp;distritoOrigen=&amp;conductorId=… · GET /ms2/viajes/{id}</span>
+            </div>
+            <form class="buscador filtros" id="filtros-viajes">
+              <select name="estado"><option value="">Todos los estados</option><option>solicitado</option><option>en_curso</option><option>finalizado</option><option>cancelado</option></select>
+              <select name="distritoOrigen"><option value="">Origen: todos</option><option>Barranco</option><option>Callao</option><option>Jesús María</option><option>La Molina</option><option>Lince</option><option>Magdalena</option><option>Miraflores</option><option>Pueblo Libre</option><option>San Borja</option><option>San Isidro</option><option>San Juan de Lurigancho</option><option>Surco</option></select>
+              <select name="distritoDestino"><option value="">Destino: todos</option><option>Barranco</option><option>Callao</option><option>Jesús María</option><option>La Molina</option><option>Lince</option><option>Magdalena</option><option>Miraflores</option><option>Pueblo Libre</option><option>San Borja</option><option>San Isidro</option><option>San Juan de Lurigancho</option><option>Surco</option></select>
+              <input name="conductorId" type="number" min="1" placeholder="ID conductor" />
+              <input name="pasajeroId" type="number" min="1" placeholder="ID pasajero" />
+              <button type="submit">Buscar</button>
+              <button type="reset" class="sec">Limpiar</button>
+            </form>
+            <div class="tablewrap"><table id="tabla-viajes"><thead><tr>
+              <th>Viaje</th><th>Origen → Destino</th><th>Estado</th><th class="num">Monto</th><th>Pago</th>
+            </tr></thead><tbody></tbody></table></div>
+            <div class="paginacion" id="pag-viajes"></div>
+          </section>
+
+          <!-- CALIFICACIONES (MS3: GET /ms3/calificaciones + GET /ms3/calificaciones/{id}) -->
+          <section id="tab-calificaciones" class="panel">
+            <div class="panel-head">
+              <p class="bajada">Lo que dicen los pasajeros. Las de menos de 3 estrellas se marcan en rojo.</p>
+              <span class="metodos">GET /ms3/calificaciones?q=&amp;min_rating=&amp;tag=&amp;conductor_id=…</span>
+            </div>
+            <form class="buscador filtros" id="filtros-calificaciones">
+              <input name="q" type="search" placeholder="Buscar en comentarios (ej. puntual, música)" />
+              <select name="min_rating"><option value="">Cualquier rating</option><option value="5">5 ★</option><option value="4">4 ★ o más</option><option value="3">3 ★ o más</option><option value="2">2 ★ o más</option></select>
+              <select name="tag"><option value="">Cualquier tag</option><option>amable</option><option>auto_limpio</option><option>conduccion_segura</option><option>musica_agradable</option><option>puntual</option><option>ruta_eficiente</option><option>brusco</option><option>tarde</option></select>
+              <input name="conductor_id" type="number" min="1" placeholder="ID conductor" />
+              <button type="submit">Buscar</button>
+              <button type="reset" class="sec">Limpiar</button>
+            </form>
+            <div class="tablewrap"><table id="tabla-calificaciones"><thead><tr>
+              <th>Viaje</th><th>Rating</th><th>Comentario</th><th>Tags</th><th>Fecha</th>
+            </tr></thead><tbody></tbody></table></div>
+            <div class="paginacion" id="pag-calificaciones"></div>
+          </section>
+
+          <!-- RESUMEN CONDUCTOR (MS3: GET /ms3/conductores/{id}/resumen) -->
+          <section id="tab-conductor" class="panel">
+            <div class="panel-head">
+              <p class="bajada">Reputación agregada de un conductor (agregación en MongoDB).</p>
+              <span class="metodos">GET /ms3/conductores/{id}/resumen</span>
+            </div>
+            <div class="buscador">
+              <input id="conductor-id" type="number" min="1" max="600" value="101" placeholder="ID conductor (1–600)" />
+              <button id="btn-conductor">Consultar</button>
+            </div>
+            <div id="resumen-conductor" class="tarjetas"></div>
+          </section>
+
+          <!-- REGLAS DE NEGOCIO (MS1: elegibilidad, categoría, disponibles, validación; MS1 consulta el rating en MS3) -->
+          <section id="tab-reglas" class="panel">
+            <div class="panel-head">
+              <p class="bajada">Reglas de negocio de MS1. El rating se consulta en vivo a MS3.</p>
+              <span class="metodos">GET /ms1/conductores/{id}/elegibilidad · /categoria · /conductores/disponibles · /usuarios/{id}/validacion</span>
+            </div>
+
+            <h3 class="subtit">Evaluar conductor</h3>
+            <div class="buscador">
+              <input id="regla-conductor-id" type="number" min="1" max="600" value="101" placeholder="ID conductor (1–600)" />
+              <button id="btn-evaluar">Evaluar</button>
+            </div>
+            <div id="regla-conductor"></div>
+
+            <h3 class="subtit">Conductores disponibles</h3>
+            <div class="buscador">
+              <select id="regla-distrito"><option value="">Todos los distritos</option><option>Barranco</option><option>Callao</option><option>Jesús María</option><option>La Molina</option><option>Lince</option><option>Magdalena</option><option>Miraflores</option><option>Pueblo Libre</option><option>San Borja</option><option>San Isidro</option><option>San Juan de Lurigancho</option><option>Surco</option></select>
+              <select id="regla-servicio"><option value="">Cualquier servicio</option><option>economico</option><option>estandar</option><option>confort</option><option>xl</option></select>
+              <button id="btn-disponibles">Buscar</button>
+            </div>
+            <div id="regla-disponibles"></div>
+
+            <h3 class="subtit">¿Puede viajar este pasajero?</h3>
+            <div class="buscador">
+              <input id="regla-usuario-id" type="number" min="1" max="20000" value="2" placeholder="ID usuario" />
+              <button id="btn-validar-usuario">Validar</button>
+            </div>
+            <div id="regla-usuario"></div>
+          </section>
+
+          <!-- PERFIL (MS4: orquestador, consume MS1+MS2+MS3) -->
+          <section id="tab-perfil" class="panel">
+            <div class="panel-head">
+              <p class="bajada">MS4 no tiene base de datos: une MS1 + MS2 + MS3 en una sola respuesta.</p>
+              <span class="metodos">GET /ms4/usuarios/{id}/perfil · GET /ms4/conductores/{id}/hoja-de-vida</span>
+            </div>
+            <div class="buscador">
+              <input id="perfil-usuario-id" type="number" min="1" max="20000" value="695" placeholder="ID usuario" />
+              <button id="btn-perfil-usuario">Perfil de usuario</button>
+              <input id="perfil-conductor-id" type="number" min="1" max="600" value="101" placeholder="ID conductor" />
+              <button id="btn-perfil-conductor">Hoja de vida</button>
+            </div>
+            <div id="perfil-resultado"></div>
+          </section>
+
+          <!-- ANALITICA (MS5: Athena sobre el data lake) -->
+          <section id="tab-analitica" class="panel">
+            <div class="panel-head">
+              <p class="bajada">Consultas SQL en Athena sobre el data lake (S3 + Glue).</p>
+              <span class="metodos">GET /ms5/ingresos/por-hora-distrito · /conductores/rating-por-distrito · /vistas/…</span>
+            </div>
+            <div id="analitica-cont"></div>
+          </section>
+
+          <div id="aviso" class="aviso" hidden></div>
+        </main>
+
+        <!-- ===== CARRIL DE DETALLE (320px) ===== -->
+        <aside class="carril" id="carril" aria-live="polite">
+          <div class="carril-vacio">
+            <p class="carril-eyebrow">Detalle</p>
+            <p>Elige una fila para ver su ficha aquí.</p>
+            <p class="carril-ayuda">Cada ficha lleva al siguiente paso:<br />viaje → conductor → calificación → perfil.</p>
+          </div>
+        </aside>
       </div>
     </div>
-  </header>
-
-  <nav class="tabs" id="tabs">
-    <button class="tab activa" data-tab="usuarios">Usuarios</button>
-    <button class="tab" data-tab="viajes">Viajes</button>
-    <button class="tab" data-tab="calificaciones">Calificaciones</button>
-    <button class="tab" data-tab="conductor">Resumen conductor</button>
-    <button class="tab" data-tab="reglas">Reglas MS1</button>
-    <button class="tab" data-tab="perfil">Perfil MS4</button>
-    <button class="tab" data-tab="analitica" data-admin="1">Analítica</button>
-  </nav>
-
-  <main>
-    <!-- USUARIOS (MS1: GET /ms1/usuarios + GET /ms1/usuarios/{id}) -->
-    <section id="tab-usuarios" class="panel activa">
-      <div class="panel-head">
-        <h2>Usuarios <span class="ms">MS1</span></h2>
-        <span class="metodos">GET /ms1/usuarios · GET /ms1/usuarios/{id}</span>
-      </div>
-      <div class="tablewrap"><table id="tabla-usuarios"><thead><tr>
-        <th>ID</th><th>Nombre</th><th>Distrito</th><th>Registro</th><th></th>
-      </tr></thead><tbody></tbody></table></div>
-      <div class="paginacion" id="pag-usuarios"></div>
-    </section>
-
-    <!-- VIAJES (MS2: GET /ms2/viajes + GET /ms2/viajes/{id}) -->
-    <section id="tab-viajes" class="panel">
-      <div class="panel-head">
-        <h2>Viajes <span class="ms">MS2</span></h2>
-        <span class="metodos">GET /ms2/viajes?estado=&amp;distritoOrigen=&amp;conductorId=… · GET /ms2/viajes/{id}</span>
-      </div>
-      <form class="buscador filtros" id="filtros-viajes">
-        <select name="estado"><option value="">Todos los estados</option><option>solicitado</option><option>en_curso</option><option>finalizado</option><option>cancelado</option></select>
-        <select name="distritoOrigen"><option value="">Origen: todos</option><option>Barranco</option><option>Callao</option><option>Jesús María</option><option>La Molina</option><option>Lince</option><option>Magdalena</option><option>Miraflores</option><option>Pueblo Libre</option><option>San Borja</option><option>San Isidro</option><option>San Juan de Lurigancho</option><option>Surco</option></select>
-        <select name="distritoDestino"><option value="">Destino: todos</option><option>Barranco</option><option>Callao</option><option>Jesús María</option><option>La Molina</option><option>Lince</option><option>Magdalena</option><option>Miraflores</option><option>Pueblo Libre</option><option>San Borja</option><option>San Isidro</option><option>San Juan de Lurigancho</option><option>Surco</option></select>
-        <input name="conductorId" type="number" min="1" placeholder="ID conductor" />
-        <input name="pasajeroId" type="number" min="1" placeholder="ID pasajero" />
-        <button type="submit">Buscar</button>
-        <button type="reset" class="sec">Limpiar</button>
-      </form>
-      <div class="tablewrap"><table id="tabla-viajes"><thead><tr>
-        <th>ID</th><th>Origen → Destino</th><th>Estado</th><th>Monto</th><th>Método</th>
-      </tr></thead><tbody></tbody></table></div>
-      <div class="paginacion" id="pag-viajes"></div>
-    </section>
-
-    <!-- CALIFICACIONES (MS3: GET /ms3/calificaciones + GET /ms3/calificaciones/{id}) -->
-    <section id="tab-calificaciones" class="panel">
-      <div class="panel-head">
-        <h2>Calificaciones <span class="ms">MS3</span></h2>
-        <span class="metodos">GET /ms3/calificaciones?q=&amp;min_rating=&amp;tag=&amp;conductor_id=…</span>
-      </div>
-      <form class="buscador filtros" id="filtros-calificaciones">
-        <input name="q" type="search" placeholder="Buscar en comentarios (ej. puntual, música)" />
-        <select name="min_rating"><option value="">Cualquier rating</option><option value="5">5 ★</option><option value="4">4 ★ o más</option><option value="3">3 ★ o más</option><option value="2">2 ★ o más</option></select>
-        <select name="tag"><option value="">Cualquier tag</option><option>amable</option><option>auto_limpio</option><option>conduccion_segura</option><option>musica_agradable</option><option>puntual</option><option>ruta_eficiente</option><option>brusco</option><option>tarde</option></select>
-        <input name="conductor_id" type="number" min="1" placeholder="ID conductor" />
-        <button type="submit">Buscar</button>
-        <button type="reset" class="sec">Limpiar</button>
-      </form>
-      <div class="tablewrap"><table id="tabla-calificaciones"><thead><tr>
-        <th>Viaje</th><th>Rating</th><th>Comentario</th><th>Tags</th><th>Fecha</th>
-      </tr></thead><tbody></tbody></table></div>
-      <div class="paginacion" id="pag-calificaciones"></div>
-    </section>
-
-    <!-- RESUMEN CONDUCTOR (MS3: GET /ms3/conductores/{id}/resumen) -->
-    <section id="tab-conductor" class="panel">
-      <div class="panel-head">
-        <h2>Resumen de conductor <span class="ms">MS3</span></h2>
-        <span class="metodos">GET /ms3/conductores/{id}/resumen</span>
-      </div>
-      <div class="buscador">
-        <input id="conductor-id" type="number" min="1" max="600" value="101" placeholder="ID conductor (1–600)" />
-        <button id="btn-conductor">Consultar</button>
-      </div>
-      <div id="resumen-conductor" class="tarjetas"></div>
-    </section>
-
-    <!-- REGLAS DE NEGOCIO (MS1: elegibilidad, categoría, disponibles, validación; MS1 consulta el rating en MS3) -->
-    <section id="tab-reglas" class="panel">
-      <div class="panel-head">
-        <h2>Reglas de negocio <span class="ms">MS1</span></h2>
-        <span class="metodos">GET /ms1/conductores/{id}/elegibilidad · /categoria · /conductores/disponibles · /usuarios/{id}/validacion</span>
-      </div>
-
-      <h3 class="subtit">Evaluar conductor</h3>
-      <div class="buscador">
-        <input id="regla-conductor-id" type="number" min="1" max="600" value="101" placeholder="ID conductor (1–600)" />
-        <button id="btn-evaluar">Evaluar</button>
-      </div>
-      <div id="regla-conductor"></div>
-
-      <h3 class="subtit">Conductores disponibles</h3>
-      <div class="buscador">
-        <select id="regla-distrito"><option value="">Todos los distritos</option><option>Barranco</option><option>Callao</option><option>Jesús María</option><option>La Molina</option><option>Lince</option><option>Magdalena</option><option>Miraflores</option><option>Pueblo Libre</option><option>San Borja</option><option>San Isidro</option><option>San Juan de Lurigancho</option><option>Surco</option></select>
-        <select id="regla-servicio"><option value="">Cualquier servicio</option><option>economico</option><option>estandar</option><option>confort</option><option>xl</option></select>
-        <button id="btn-disponibles">Buscar</button>
-      </div>
-      <div id="regla-disponibles"></div>
-
-      <h3 class="subtit">¿Puede viajar este pasajero?</h3>
-      <div class="buscador">
-        <input id="regla-usuario-id" type="number" min="1" max="20000" value="2" placeholder="ID usuario" />
-        <button id="btn-validar-usuario">Validar</button>
-      </div>
-      <div id="regla-usuario"></div>
-    </section>
-
-    <!-- PERFIL (MS4: orquestador, consume MS1+MS2+MS3) -->
-    <section id="tab-perfil" class="panel">
-      <div class="panel-head">
-        <h2>Historial · orquestador <span class="ms">MS4</span></h2>
-        <span class="metodos">GET /ms4/usuarios/{id}/perfil · GET /ms4/conductores/{id}/hoja-de-vida</span>
-      </div>
-      <div class="buscador">
-        <input id="perfil-usuario-id" type="number" min="1" max="20000" value="695" placeholder="ID usuario" />
-        <button id="btn-perfil-usuario">Perfil de usuario</button>
-        <input id="perfil-conductor-id" type="number" min="1" max="600" value="101" placeholder="ID conductor" />
-        <button id="btn-perfil-conductor">Hoja de vida</button>
-      </div>
-      <div id="perfil-resultado"></div>
-    </section>
-
-    <!-- ANALITICA (MS5: GET /ms5/ingresos/por-hora-distrito) -->
-    <section id="tab-analitica" class="panel">
-      <div class="panel-head">
-        <h2>Ingreso promedio por hora y distrito <span class="ms">MS5</span></h2>
-        <span class="metodos">GET /ms5/ingresos/por-hora-distrito</span>
-      </div>
-      <div id="analitica-cont" class="tablewrap"></div>
-    </section>
-
-    <div id="aviso" class="aviso" hidden></div>
-  </main>
-
-  <footer>transporte urbano · CS2032 · frontend (P4) · desplegable en AWS Amplify</footer>
+  </div>
 
   <script src="https://accounts.google.com/gsi/client" async defer></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
