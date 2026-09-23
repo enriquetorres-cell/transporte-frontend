@@ -91,8 +91,17 @@
     <section id="tab-viajes" class="panel">
       <div class="panel-head">
         <h2>Viajes <span class="ms">MS2</span></h2>
-        <span class="metodos">GET /ms2/viajes · GET /ms2/viajes/{id}</span>
+        <span class="metodos">GET /ms2/viajes?estado=&amp;distritoOrigen=&amp;conductorId=… · GET /ms2/viajes/{id}</span>
       </div>
+      <form class="buscador filtros" id="filtros-viajes">
+        <select name="estado"><option value="">Todos los estados</option><option>solicitado</option><option>en_curso</option><option>finalizado</option><option>cancelado</option></select>
+        <select name="distritoOrigen"><option value="">Origen: todos</option><option>Barranco</option><option>Callao</option><option>Jesús María</option><option>La Molina</option><option>Lince</option><option>Magdalena</option><option>Miraflores</option><option>Pueblo Libre</option><option>San Borja</option><option>San Isidro</option><option>San Juan de Lurigancho</option><option>Surco</option></select>
+        <select name="distritoDestino"><option value="">Destino: todos</option><option>Barranco</option><option>Callao</option><option>Jesús María</option><option>La Molina</option><option>Lince</option><option>Magdalena</option><option>Miraflores</option><option>Pueblo Libre</option><option>San Borja</option><option>San Isidro</option><option>San Juan de Lurigancho</option><option>Surco</option></select>
+        <input name="conductorId" type="number" min="1" placeholder="ID conductor" />
+        <input name="pasajeroId" type="number" min="1" placeholder="ID pasajero" />
+        <button type="submit">Buscar</button>
+        <button type="reset" class="sec">Limpiar</button>
+      </form>
       <div class="tablewrap"><table id="tabla-viajes"><thead><tr>
         <th>ID</th><th>Origen → Destino</th><th>Estado</th><th>Monto</th><th>Método</th>
       </tr></thead><tbody></tbody></table></div>
@@ -103,8 +112,16 @@
     <section id="tab-calificaciones" class="panel">
       <div class="panel-head">
         <h2>Calificaciones <span class="ms">MS3</span></h2>
-        <span class="metodos">GET /ms3/calificaciones · GET /ms3/calificaciones/{id}</span>
+        <span class="metodos">GET /ms3/calificaciones?q=&amp;min_rating=&amp;tag=&amp;conductor_id=…</span>
       </div>
+      <form class="buscador filtros" id="filtros-calificaciones">
+        <input name="q" type="search" placeholder="Buscar en comentarios (ej. puntual, música)" />
+        <select name="min_rating"><option value="">Cualquier rating</option><option value="5">5 ★</option><option value="4">4 ★ o más</option><option value="3">3 ★ o más</option><option value="2">2 ★ o más</option></select>
+        <select name="tag"><option value="">Cualquier tag</option><option>amable</option><option>auto_limpio</option><option>conduccion_segura</option><option>musica_agradable</option><option>puntual</option><option>ruta_eficiente</option><option>brusco</option><option>tarde</option></select>
+        <input name="conductor_id" type="number" min="1" placeholder="ID conductor" />
+        <button type="submit">Buscar</button>
+        <button type="reset" class="sec">Limpiar</button>
+      </form>
       <div class="tablewrap"><table id="tabla-calificaciones"><thead><tr>
         <th>Viaje</th><th>Rating</th><th>Comentario</th><th>Tags</th><th>Fecha</th>
       </tr></thead><tbody></tbody></table></div>

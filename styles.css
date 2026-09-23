@@ -148,3 +148,7 @@ body.bloqueado #login-gate{
 .subtit{margin:22px 0 10px;font-size:14px;font-weight:600}
 .buscador select{background:var(--surface);border:1px solid var(--border2);color:var(--ink);border-radius:8px;padding:9px 10px;font:inherit}
 .motivos{margin:10px 0 0 18px;color:var(--muted);font-size:13px}
+.buscador.filtros{flex-wrap:wrap}
+.buscador.filtros input{width:150px}
+.buscador.filtros input[type=search]{width:280px;max-width:100%}
+.buscador button.sec{background:transparent;border:1px solid var(--border2);color:var(--muted)}

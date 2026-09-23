@@ -149,6 +149,26 @@ function pintarPaginacion(cont, ms, tab, data) {
     b.addEventListener("click", () => { estado[tab] += Number(b.dataset.d); cargar(tab); }));
 }
 
+// --- filtros de búsqueda (MS2 viajes / MS3 calificaciones) ------------
+const filtros = { viajes: "", calificaciones: "" };
+function conectarFiltros(tab) {
+  const form = document.getElementById("filtros-" + tab);
+  const aplicar = () => {
+    const q = new URLSearchParams();
+    new FormData(form).forEach((v, k) => { if (String(v).trim()) q.set(k, String(v).trim()); });
+    filtros[tab] = q.toString() ? "&" + q : "";
+    estado[tab] = 1;
+    cargar(tab);
+  };
+  form.addEventListener("submit", (e) => { e.preventDefault(); aplicar(); });
+  form.addEventListener("reset", () => setTimeout(aplicar, 0));
+}
+conectarFiltros("viajes");
+conectarFiltros("calificaciones");
+function sinResultados(tb, cols) {
+  tb.innerHTML = `<tr><td colspan="${cols}" class="cargando">Sin resultados para esos filtros.</td></tr>`;
+}
+
 // --- cargadores por pestaña ------------------------------------------
 async function cargar(tab) {
   if (tab === "usuarios") return cargarUsuarios();
@@ -186,8 +206,9 @@ async function verUsuario(id) {
 async function cargarViajes() {
   const tb = document.querySelector("#tabla-viajes tbody");
   tb.innerHTML = `<tr><td colspan="5" class="cargando">Cargando…</td></tr>`;
-  const d = await pedir(`${urlDe("ms2")}/viajes?page=${estado.viajes}&limit=${LIMIT}`);
+  const d = await pedir(`${urlDe("ms2")}/viajes?page=${estado.viajes}&limit=${LIMIT}${filtros.viajes}`);
   if (!d) { tb.innerHTML = ""; return; }
+  if (!d.items.length) sinResultados(tb, 5); else
   tb.innerHTML = d.items.map((v) => `<tr>
     <td><a class="link" data-id="${v.id}">${v.id}</a></td>
     <td>${v.distrito_origen} → ${v.distrito_destino}</td>
@@ -209,8 +230,9 @@ async function verViaje(id) {
 async function cargarCalificaciones() {
   const tb = document.querySelector("#tabla-calificaciones tbody");
   tb.innerHTML = `<tr><td colspan="5" class="cargando">Cargando…</td></tr>`;
-  const d = await pedir(`${urlDe("ms3")}/calificaciones?page=${estado.calificaciones}&limit=${LIMIT}`);
+  const d = await pedir(`${urlDe("ms3")}/calificaciones?page=${estado.calificaciones}&limit=${LIMIT}${filtros.calificaciones}`);
   if (!d) { tb.innerHTML = ""; return; }
+  if (!d.items.length) sinResultados(tb, 5); else
   tb.innerHTML = d.items.map((c) => `<tr>
     <td>${c.viaje_id}</td>
     <td><span class="rating">${estrellas(c.rating)}</span></td>
