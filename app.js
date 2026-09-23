@@ -334,7 +334,7 @@ document.getElementById("btn-perfil-usuario").addEventListener("click", cargarPe
 document.getElementById("btn-perfil-conductor").addEventListener("click", cargarHojaVida);
 
 async function cargarPerfilUsuario() {
-  const id = document.getElementById("perfil-usuario-id").value || 5;
+  const id = document.getElementById("perfil-usuario-id").value || 695;
   const cont = document.getElementById("perfil-resultado");
   cont.innerHTML = `<div class="cargando">Cargando… (MS4 consulta MS1 + MS2 + MS3)</div>`;
   const d = await pedir(`${urlDe("ms4")}/usuarios/${id}/perfil`);
