@@ -69,6 +69,7 @@
     <button class="tab" data-tab="viajes">Viajes</button>
     <button class="tab" data-tab="calificaciones">Calificaciones</button>
     <button class="tab" data-tab="conductor">Resumen conductor</button>
+    <button class="tab" data-tab="reglas">Reglas MS1</button>
     <button class="tab" data-tab="perfil">Perfil MS4</button>
     <button class="tab" data-tab="analitica" data-admin="1">Analítica</button>
   </nav>
@@ -121,6 +122,36 @@
         <button id="btn-conductor">Consultar</button>
       </div>
       <div id="resumen-conductor" class="tarjetas"></div>
+    </section>
+
+    <!-- REGLAS DE NEGOCIO (MS1: elegibilidad, categoría, disponibles, validación; MS1 consulta el rating en MS3) -->
+    <section id="tab-reglas" class="panel">
+      <div class="panel-head">
+        <h2>Reglas de negocio <span class="ms">MS1</span></h2>
+        <span class="metodos">GET /ms1/conductores/{id}/elegibilidad · /categoria · /conductores/disponibles · /usuarios/{id}/validacion</span>
+      </div>
+
+      <h3 class="subtit">Evaluar conductor</h3>
+      <div class="buscador">
+        <input id="regla-conductor-id" type="number" min="1" max="600" value="101" placeholder="ID conductor (1–600)" />
+        <button id="btn-evaluar">Evaluar</button>
+      </div>
+      <div id="regla-conductor"></div>
+
+      <h3 class="subtit">Conductores disponibles</h3>
+      <div class="buscador">
+        <select id="regla-distrito"><option value="">Todos los distritos</option><option>Barranco</option><option>Callao</option><option>Jesús María</option><option>La Molina</option><option>Lince</option><option>Magdalena</option><option>Miraflores</option><option>Pueblo Libre</option><option>San Borja</option><option>San Isidro</option><option>San Juan de Lurigancho</option><option>Surco</option></select>
+        <select id="regla-servicio"><option value="">Cualquier servicio</option><option>economico</option><option>estandar</option><option>confort</option><option>xl</option></select>
+        <button id="btn-disponibles">Buscar</button>
+      </div>
+      <div id="regla-disponibles"></div>
+
+      <h3 class="subtit">¿Puede viajar este pasajero?</h3>
+      <div class="buscador">
+        <input id="regla-usuario-id" type="number" min="1" max="20000" value="2" placeholder="ID usuario" />
+        <button id="btn-validar-usuario">Validar</button>
+      </div>
+      <div id="regla-usuario"></div>
     </section>
 
     <!-- PERFIL (MS4: orquestador, consume MS1+MS2+MS3) -->

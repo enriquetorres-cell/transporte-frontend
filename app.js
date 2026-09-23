@@ -155,6 +155,7 @@ async function cargar(tab) {
   if (tab === "viajes") return cargarViajes();
   if (tab === "calificaciones") return cargarCalificaciones();
   if (tab === "conductor") return; // se dispara con el botón
+  if (tab === "reglas") return;    // se dispara con los botones
   if (tab === "analitica") return cargarAnalitica();
 }
 
@@ -236,6 +237,71 @@ async function cargarResumenConductor() {
   ];
   cont.innerHTML = items.map(([k, v]) =>
     `<div class="card"><div class="k">${k}</div><div class="v">${v}</div></div>`).join("");
+}
+
+// MS1 · reglas de negocio (MS1 consulta el rating real en MS3)
+const PCT = (x) => `${Math.round(x * 100)}%`;
+const siNo = (ok) => `<span class="badge ${ok ? "ok" : "bad"}">${ok ? "SÍ" : "NO"}</span>`;
+const badges = (xs) => (xs || []).map((s) => `<span class="badge">${s}</span>`).join(" ") || "—";
+const listaMotivos = (xs) => (xs && xs.length) ? `<ul class="motivos">${xs.map((m) => `<li>${m}</li>`).join("")}</ul>` : "";
+
+document.getElementById("btn-evaluar").addEventListener("click", evaluarConductor);
+async function evaluarConductor() {
+  const id = document.getElementById("regla-conductor-id").value || 101;
+  const cont = document.getElementById("regla-conductor");
+  cont.innerHTML = `<div class="cargando">Evaluando… (MS1 consulta el rating en MS3)</div>`;
+  const [e, c] = await Promise.all([
+    pedir(`${urlDe("ms1")}/conductores/${id}/elegibilidad`),
+    pedir(`${urlDe("ms1")}/conductores/${id}/categoria`),
+  ]);
+  if (!e || !c) { cont.innerHTML = ""; return; }
+  const problemas = (e.vehiculos || []).flatMap((v) => v.problemas.map((p) => `${v.placa}: ${p}`));
+  cont.innerHTML = `
+    <div class="tarjetas">
+      <div class="card"><div class="k">¿Puede operar?</div><div class="v">${siNo(e.elegible)}</div></div>
+      <div class="card"><div class="k">Nivel</div><div class="v" style="text-transform:capitalize">${c.nivel}</div><div class="k">${c.antiguedad_anios} años en la plataforma</div></div>
+      <div class="card"><div class="k">Comisión plataforma</div><div class="v">${PCT(c.comision_plataforma)}</div></div>
+      <div class="card"><div class="k">Rating · desde MS3</div><div class="v">${e.rating_promedio ?? "—"}</div><div class="k">${e.total_resenas} reseñas</div></div>
+    </div>
+    <p style="margin-top:12px;font-size:13px">Servicios habilitados: ${badges(e.servicios_habilitados)}</p>
+    ${listaMotivos([...e.motivos, ...problemas])}${avisosHTML(e.advertencias)}`;
+}
+
+document.getElementById("btn-disponibles").addEventListener("click", buscarDisponibles);
+async function buscarDisponibles() {
+  const q = new URLSearchParams({ limit: 10 });
+  const dist = document.getElementById("regla-distrito").value;
+  const serv = document.getElementById("regla-servicio").value;
+  if (dist) q.set("distrito_base", dist);
+  if (serv) q.set("tipo_servicio", serv);
+  const cont = document.getElementById("regla-disponibles");
+  cont.innerHTML = `<div class="cargando">Buscando y rankeando…</div>`;
+  const d = await pedir(`${urlDe("ms1")}/conductores/disponibles?${q}`);
+  if (!d) { cont.innerHTML = ""; return; }
+  if (!d.items.length) { cont.innerHTML = `<div class="cargando">Ningún conductor disponible con esos filtros (${d.evaluados} evaluados).</div>`; return; }
+  cont.innerHTML = `<div class="tablewrap"><table><thead><tr>
+      <th>#</th><th>Conductor</th><th>Distrito</th><th>Rating</th><th>Servicios</th><th>Puntaje</th>
+    </tr></thead><tbody>${d.items.map((x, i) => `<tr>
+      <td>${i + 1}</td><td>${x.nombre} <span style="color:var(--faint)">#${x.conductor_id}</span></td>
+      <td>${x.distrito_base ?? "—"}</td><td>${x.rating_promedio ?? "—"}</td>
+      <td>${badges(x.servicios_habilitados)}</td><td><b>${x.puntaje}</b></td>
+    </tr>`).join("")}</tbody></table></div>
+    <p style="color:var(--muted);font-size:13px;margin-top:8px">${d.total} aptos de ${d.evaluados} evaluados · puntaje = 80% rating + 20% antigüedad</p>
+    ${avisosHTML(d.advertencias)}`;
+}
+
+document.getElementById("btn-validar-usuario").addEventListener("click", validarUsuario);
+async function validarUsuario() {
+  const id = document.getElementById("regla-usuario-id").value || 2;
+  const cont = document.getElementById("regla-usuario");
+  cont.innerHTML = `<div class="cargando">Validando…</div>`;
+  const v = await pedir(`${urlDe("ms1")}/usuarios/${id}/validacion`);
+  if (!v) { cont.innerHTML = ""; return; }
+  cont.innerHTML = `
+    <div class="tarjetas">
+      <div class="card"><div class="k">¿Puede solicitar viaje?</div><div class="v">${siNo(v.puede_solicitar_viaje)}</div></div>
+      <div class="card"><div class="k">Edad</div><div class="v">${v.edad ?? "—"}</div></div>
+    </div>${listaMotivos(v.motivos)}`;
 }
 
 // MS4 · orquestador (perfil = MS1 + MS2 + MS3, sin BD propia)
